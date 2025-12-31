@@ -2,10 +2,9 @@ import { resolve, dirname } from "node:path";
 import { getRepoRoot, getRepoName, createWorktree } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
-import { runSetupScript } from "../lib/shell.js";
 import { openInNewWindow } from "../lib/iterm.js";
 
-export function create(): void {
+export function create(ref?: string): void {
   const repoRoot = getRepoRoot();
   const repoName = getRepoName();
   const word = generateRandomWord();
@@ -14,15 +13,13 @@ export function create(): void {
   const parentDir = dirname(repoRoot);
   const worktreePath = resolve(parentDir, worktreeName);
 
-  console.log(`Creating worktree: ${worktreeName}`);
-  createWorktree(worktreePath);
+  const refInfo = ref ? ` from ${ref}` : "";
+  console.log(`Creating worktree: ${worktreeName}${refInfo}`);
+  createWorktree(worktreePath, ref);
 
   const config = loadConfig();
-  if (config?.scripts?.setup) {
-    console.log(`Running setup script...`);
-    runSetupScript(config.scripts.setup, worktreePath);
-  }
+  const setupScript = config?.scripts?.setup;
 
   console.log(`Opening new iTerm window in: ${worktreePath}`);
-  openInNewWindow(worktreePath);
+  openInNewWindow(worktreePath, setupScript);
 }

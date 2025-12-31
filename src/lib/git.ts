@@ -10,6 +10,7 @@ export function getRepoName(): string {
   return basename(root);
 }
 
-export function createWorktree(path: string): void {
-  execSync(`git worktree add --detach "${path}"`, { stdio: "inherit" });
+export function createWorktree(path: string, ref?: string): void {
+  const refArg = ref ? ` "${ref}"` : "";
+  execSync(`git worktree add --detach "${path}"${refArg}`, { stdio: "inherit" });
 }
