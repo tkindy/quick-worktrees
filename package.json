@@ -1,0 +1,21 @@
+{
+  "name": "quick-worktrees",
+  "version": "0.1.0",
+  "description": "Quickly create Git worktrees with random names",
+  "type": "module",
+  "bin": {
+    "wt": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^12.0.0"
+  }
+}
