@@ -15,7 +15,7 @@ export function create(ref?: string): void {
 
   const refInfo = ref ? ` from ${ref}` : "";
   console.log(`Creating worktree: ${worktreeName}${refInfo}`);
-  createWorktree(worktreePath, ref);
+  createWorktree(worktreePath, word, ref);
 
   const config = loadConfig();
   const setupScript = config?.scripts?.setup;
