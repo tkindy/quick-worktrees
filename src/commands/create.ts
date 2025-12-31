@@ -3,6 +3,7 @@ import { getRepoRoot, getRepoName, createWorktree } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { runSetupScript } from "../lib/shell.js";
+import { openInNewWindow } from "../lib/iterm.js";
 
 export function create(): void {
   const repoRoot = getRepoRoot();
@@ -22,6 +23,6 @@ export function create(): void {
     runSetupScript(config.scripts.setup, worktreePath);
   }
 
-  console.log(`\nWorktree created at: ${worktreePath}`);
-  console.log(`\nTo enter the worktree:\n  cd ${worktreePath}`);
+  console.log(`Opening new iTerm window in: ${worktreePath}`);
+  openInNewWindow(worktreePath);
 }
