@@ -2,6 +2,7 @@
 import { program } from "commander";
 import { create } from "./commands/create.js";
 import { deleteWorktree } from "./commands/delete.js";
+import { completions } from "./commands/completions.js";
 
 program
   .name("wt")
@@ -19,5 +20,11 @@ program
   .command("delete")
   .description("Remove the worktree in the current directory")
   .action(deleteWorktree);
+
+program
+  .command("completions")
+  .description("Generate shell completions")
+  .option("-s, --shell <shell>", "Shell type", "fish")
+  .action(completions);
 
 program.parse();
