@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { getRepoRoot, isWorktree, removeWorktree, hasUncommittedChanges } from "../lib/git.js";
+import { getRepoRoot, isWorktree, removeWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, deleteBranch } from "../lib/git.js";
 
 function waitForKey(message: string): Promise<void> {
   return new Promise((resolve) => {
@@ -81,9 +81,20 @@ export async function deleteWorktree(): Promise<void> {
   }
 
   const worktreePath = getRepoRoot();
+  const branch = getCurrentBranch();
+  const mainWorktreePath = getMainWorktreePath();
+
   console.log(`Removing worktree: ${worktreePath}`);
   removeWorktree(worktreePath);
   console.log("Worktree removed successfully");
+
+  if (branch) {
+    const deleteBranchConfirmed = await confirm(`Delete branch '${branch}' as well?`);
+    if (deleteBranchConfirmed) {
+      deleteBranch(branch, mainWorktreePath);
+      console.log(`Branch '${branch}' deleted`);
+    }
+  }
 
   if (process.env.ITERM_SESSION_ID) {
     await waitForKey("Press any key to close this session...");

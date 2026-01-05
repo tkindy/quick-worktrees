@@ -28,3 +28,18 @@ export function hasUncommittedChanges(): boolean {
   const status = execSync("git status --porcelain", { encoding: "utf-8" });
   return status.trim().length > 0;
 }
+
+export function getCurrentBranch(): string | null {
+  const branch = execSync("git rev-parse --abbrev-ref HEAD", { encoding: "utf-8" }).trim();
+  return branch === "HEAD" ? null : branch;
+}
+
+export function deleteBranch(branchName: string, mainWorktreePath: string): void {
+  execSync(`git branch -D "${branchName}"`, { cwd: mainWorktreePath, stdio: "inherit" });
+}
+
+export function getMainWorktreePath(): string {
+  const output = execSync("git worktree list --porcelain", { encoding: "utf-8" });
+  const firstLine = output.split("\n")[0];
+  return firstLine.replace("worktree ", "");
+}
