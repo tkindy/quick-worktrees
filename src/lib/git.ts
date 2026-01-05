@@ -10,9 +10,13 @@ export function getRepoName(): string {
   return basename(root);
 }
 
-export function createWorktree(path: string, branchName: string, ref?: string): void {
-  const refArg = ref ? ` "${ref}"` : "";
-  execSync(`git worktree add -b "${branchName}" "${path}"${refArg}`, { stdio: "inherit" });
+export function createWorktree(path: string, branchName: string, ref?: string, existing?: boolean): void {
+  if (existing) {
+    execSync(`git worktree add "${path}" "${ref}"`, { stdio: "inherit" });
+  } else {
+    const refArg = ref ? ` "${ref}"` : "";
+    execSync(`git worktree add -b "${branchName}" "${path}"${refArg}`, { stdio: "inherit" });
+  }
 }
 
 export function isWorktree(): boolean {
