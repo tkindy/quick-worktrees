@@ -14,6 +14,7 @@ export function copyPaths(
       continue;
     }
 
+    console.log(`Copying: ${relativePath}`);
     cpSync(src, dest, { recursive: true });
   }
 }
