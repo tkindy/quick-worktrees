@@ -1,6 +1,19 @@
 import { execSync } from "node:child_process";
 import { getRepoRoot, isWorktree, removeWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, deleteBranch } from "../lib/git.js";
 
+function hasWebStormOpen(path: string): boolean {
+  try {
+    const result = execSync(`lsof -c webstorm 2>/dev/null | grep "${path}"`, {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    return result.trim().length > 0;
+  } catch {
+    // grep returns exit code 1 when no matches found
+    return false;
+  }
+}
+
 function waitForKey(message: string): Promise<void> {
   return new Promise((resolve) => {
     process.stdout.write(message);
@@ -81,6 +94,14 @@ export async function deleteWorktree(): Promise<void> {
   }
 
   const worktreePath = getRepoRoot();
+
+  if (hasWebStormOpen(worktreePath)) {
+    const confirmed = await confirm("WebStorm appears to have this worktree open. Delete anyway?");
+    if (!confirmed) {
+      console.log("Aborted");
+      return;
+    }
+  }
   const branch = getCurrentBranch();
   const mainWorktreePath = getMainWorktreePath();
 
