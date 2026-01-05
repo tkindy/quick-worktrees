@@ -1,14 +1,14 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ConductorConfig } from "../types.js";
+import type { WtConfig } from "../types.js";
 import { getRepoRoot } from "./git.js";
 
-export function loadConfig(): ConductorConfig | null {
+export function loadConfig(): WtConfig | null {
   try {
     const root = getRepoRoot();
-    const configPath = join(root, "conductor.json");
+    const configPath = join(root, "wt.json");
     const content = readFileSync(configPath, "utf-8");
-    return JSON.parse(content) as ConductorConfig;
+    return JSON.parse(content) as WtConfig;
   } catch {
     return null;
   }

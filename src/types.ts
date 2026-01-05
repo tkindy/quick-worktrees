@@ -1,5 +1,6 @@
-export interface ConductorConfig {
+export interface WtConfig {
   scripts?: {
     setup?: string;
   };
+  copyPaths?: string[];
 }

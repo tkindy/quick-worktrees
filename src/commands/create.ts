@@ -2,6 +2,7 @@ import { resolve, dirname } from "node:path";
 import { getRepoRoot, getRepoName, createWorktree } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
+import { copyPaths } from "../lib/copy.js";
 import { openInNewWindow } from "../lib/iterm.js";
 
 export function create(ref?: string, options?: { existing?: boolean }): void {
@@ -25,6 +26,11 @@ export function create(ref?: string, options?: { existing?: boolean }): void {
   createWorktree(worktreePath, word, ref, existing);
 
   const config = loadConfig();
+
+  if (config?.copyPaths?.length) {
+    copyPaths(repoRoot, worktreePath, config.copyPaths);
+  }
+
   const setupScript = config?.scripts?.setup;
 
   console.log(`Opening new iTerm window in: ${worktreePath}`);
