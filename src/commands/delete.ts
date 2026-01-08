@@ -28,7 +28,7 @@ function waitForKey(message: string): Promise<void> {
   });
 }
 
-function closeItermSession(): void {
+function closeItermWindow(): void {
   const sessionId = process.env.ITERM_SESSION_ID;
   if (!sessionId) return;
 
@@ -44,7 +44,7 @@ function closeItermSession(): void {
             tell aTab
               repeat with aSession in sessions
                 if unique ID of aSession is "${uuid}" then
-                  close aSession
+                  close aWindow
                   return
                 end if
               end repeat
@@ -60,7 +60,7 @@ function closeItermSession(): void {
       stdio: "ignore",
     });
   } catch {
-    // Ignore errors - session may already be closed
+    // Ignore errors - window may already be closed
   }
 }
 
@@ -118,7 +118,7 @@ export async function deleteWorktree(): Promise<void> {
   }
 
   if (process.env.ITERM_SESSION_ID) {
-    await waitForKey("Press any key to close this session...");
-    closeItermSession();
+    await waitForKey("Press any key to close this window...");
+    closeItermWindow();
   }
 }
