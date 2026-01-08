@@ -26,3 +26,7 @@ CLI tool (`wt`) for quickly creating git worktrees with random nature-themed nam
 **Worktree naming:** `{repo-name}-{random-word}` placed in parent directory of current repo
 
 **Optional config:** Repos can have `wt.json` with `scripts.setup` to run in new worktree window and `copyPaths` array for files/directories to copy (e.g., `.idea`, `.claude`)
+
+## Guidelines
+
+When adding, editing, or removing CLI commands, update the shell completions in `commands/completions.ts` to reflect those changes.

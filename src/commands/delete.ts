@@ -1,5 +1,6 @@
 import { execSync } from "node:child_process";
 import { getRepoRoot, isWorktree, removeWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, deleteBranch } from "../lib/git.js";
+import { closeCurrentWindow } from "../lib/iterm.js";
 
 function hasWebStormOpen(path: string): boolean {
   try {
@@ -26,42 +27,6 @@ function waitForKey(message: string): Promise<void> {
       resolve();
     });
   });
-}
-
-function closeItermWindow(): void {
-  const sessionId = process.env.ITERM_SESSION_ID;
-  if (!sessionId) return;
-
-  // ITERM_SESSION_ID format is "w0t0p0:UUID", we need just the UUID
-  const uuid = sessionId.split(":")[1];
-  if (!uuid) return;
-
-  const script = `
-    tell application "iTerm2"
-      repeat with aWindow in windows
-        tell aWindow
-          repeat with aTab in tabs
-            tell aTab
-              repeat with aSession in sessions
-                if unique ID of aSession is "${uuid}" then
-                  close aWindow
-                  return
-                end if
-              end repeat
-            end tell
-          end repeat
-        end tell
-      end repeat
-    end tell
-  `;
-
-  try {
-    execSync(`osascript -e '${script.replace(/'/g, "'\"'\"'")}'`, {
-      stdio: "ignore",
-    });
-  } catch {
-    // Ignore errors - window may already be closed
-  }
 }
 
 function confirm(message: string): Promise<boolean> {
@@ -119,6 +84,6 @@ export async function deleteWorktree(): Promise<void> {
 
   if (process.env.ITERM_SESSION_ID) {
     await waitForKey("Press any key to close this window...");
-    closeItermWindow();
+    closeCurrentWindow();
   }
 }
