@@ -9,6 +9,7 @@ complete --command wt --condition "__fish_use_subcommand" --arguments "completio
 
 complete --command wt --condition "__fish_seen_subcommand_from new" --arguments "(git branch --format='%(refname:short)')" --description "Branch"
 complete --command wt --condition "__fish_seen_subcommand_from new" --short-option e --long-option existing --description "Checkout an existing branch instead of creating a new one"
+complete --command wt --condition "__fish_seen_subcommand_from new" --short-option b --long-option branch-name --exclusive --description "Use a custom branch name instead of a random one"
 complete --command wt --condition "__fish_seen_subcommand_from open" --arguments "(git worktree list --porcelain | string match --regex '(?<=^branch refs/heads/).*')" --description "Worktree branch"
 complete --command wt --condition "__fish_seen_subcommand_from completions" --short-option s --long-option shell --exclusive --arguments "fish" --description "Shell type"`;
 

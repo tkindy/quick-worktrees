@@ -5,17 +5,24 @@ import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
 import { openInNewWindow } from "../lib/iterm.js";
 
-export function create(ref?: string, options?: { existing?: boolean }): void {
+export function create(ref?: string, options?: { existing?: boolean; branchName?: string }): void {
   const existing = options?.existing;
+  const customName = options?.branchName;
 
   if (existing && !ref) {
     console.error("Error: --existing requires a branch name");
     process.exit(1);
   }
 
+  if (existing && customName) {
+    console.error("Error: --existing and --branch-name are mutually exclusive");
+    process.exit(1);
+  }
+
   const repoRoot = getRepoRoot();
   const repoName = getRepoName();
   const word = generateRandomWord();
+  const branchName = customName ?? word;
 
   const worktreeName = `${repoName}-${word}`;
   const parentDir = dirname(repoRoot);
@@ -23,7 +30,7 @@ export function create(ref?: string, options?: { existing?: boolean }): void {
 
   const refInfo = ref ? ` from ${ref}` : "";
   console.log(`Creating worktree: ${worktreeName}${refInfo}`);
-  createWorktree(worktreePath, word, ref, existing);
+  createWorktree(worktreePath, branchName, ref, existing);
 
   const config = loadConfig();
 

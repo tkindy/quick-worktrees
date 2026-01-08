@@ -16,6 +16,7 @@ program
   .description("Create a new worktree with a random name")
   .argument("[ref]", "Branch name or commit SHA to base the worktree on")
   .option("-e, --existing", "Checkout an existing branch instead of creating a new one")
+  .option("-b, --branch-name <name>", "Use a custom branch name instead of a random one")
   .action(create);
 
 program
