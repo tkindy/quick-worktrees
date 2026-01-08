@@ -1,5 +1,6 @@
 import { resolve, dirname } from "node:path";
-import { getRepoRoot, getRepoName, createWorktree } from "../lib/git.js";
+import { existsSync } from "node:fs";
+import { getRepoRoot, getRepoName, createWorktree, branchExists } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
@@ -21,12 +22,36 @@ export function newWorktree(ref?: string, options?: { existing?: boolean; branch
 
   const repoRoot = getRepoRoot();
   const repoName = getRepoName();
-  const word = generateRandomWord();
-  const branchName = customName ?? word;
-
-  const worktreeName = `${repoName}-${word}`;
   const parentDir = dirname(repoRoot);
-  const worktreePath = resolve(parentDir, worktreeName);
+
+  const MAX_ATTEMPTS = 5;
+  let word: string = "";
+  let branchName: string = "";
+  let worktreeName: string = "";
+  let worktreePath: string = "";
+  let attempts = 0;
+
+  do {
+    word = generateRandomWord();
+    branchName = existing ? ref! : (customName ?? word);
+    worktreeName = `${repoName}-${word}`;
+    worktreePath = resolve(parentDir, worktreeName);
+
+    const dirExists = existsSync(worktreePath);
+    const branchAlreadyExists = !existing && !customName && branchExists(branchName);
+
+    if (!dirExists && !branchAlreadyExists) {
+      break;
+    }
+
+    attempts++;
+  } while (attempts < MAX_ATTEMPTS);
+
+  if (attempts >= MAX_ATTEMPTS) {
+    console.error(`Error: Could not find an available worktree name after ${MAX_ATTEMPTS} attempts.`);
+    console.error("Try specifying a custom branch name with --branch-name.");
+    process.exit(1);
+  }
 
   const refInfo = ref ? ` from ${ref}` : "";
   console.log(`Creating worktree: ${worktreeName}${refInfo}`);

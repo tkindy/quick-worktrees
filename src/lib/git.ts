@@ -77,3 +77,12 @@ export function listWorktrees(): Worktree[] {
 export function getWorktreeByBranch(branch: string): Worktree | undefined {
   return listWorktrees().find((wt) => wt.branch === branch);
 }
+
+export function branchExists(branchName: string): boolean {
+  try {
+    execSync(`git rev-parse --verify "refs/heads/${branchName}"`, { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+}
