@@ -1,5 +1,4 @@
 import { getWorktreeByBranch } from "../lib/git.js";
-import { loadConfig } from "../lib/config.js";
 import { openInNewWindow } from "../lib/iterm.js";
 
 export function open(branch: string): void {
@@ -10,9 +9,6 @@ export function open(branch: string): void {
     process.exit(1);
   }
 
-  const config = loadConfig();
-  const setupScript = config?.scripts?.setup;
-
   console.log(`Opening iTerm window in: ${worktree.path}`);
-  openInNewWindow(worktree.path, setupScript);
+  openInNewWindow(worktree.path);
 }
