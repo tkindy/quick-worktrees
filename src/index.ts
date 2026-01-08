@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { program } from "commander";
-import { create } from "./commands/create.js";
+import { newWorktree } from "./commands/new.js";
 import { deleteWorktree } from "./commands/delete.js";
 import { open } from "./commands/open.js";
 import { close } from "./commands/close.js";
@@ -17,7 +17,7 @@ program
   .argument("[ref]", "Branch name or commit SHA to base the worktree on")
   .option("-e, --existing", "Checkout an existing branch instead of creating a new one")
   .option("-b, --branch-name <name>", "Use a custom branch name instead of a random one")
-  .action(create);
+  .action(newWorktree);
 
 program
   .command("delete")

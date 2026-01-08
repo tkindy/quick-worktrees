@@ -5,7 +5,7 @@ import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
 import { openInNewWindow } from "../lib/iterm.js";
 
-export function create(ref?: string, options?: { existing?: boolean; branchName?: string }): void {
+export function newWorktree(ref?: string, options?: { existing?: boolean; branchName?: string }): void {
   const existing = options?.existing;
   const customName = options?.branchName;
 
