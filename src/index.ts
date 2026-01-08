@@ -2,6 +2,7 @@
 import { program } from "commander";
 import { create } from "./commands/create.js";
 import { deleteWorktree } from "./commands/delete.js";
+import { open } from "./commands/open.js";
 import { completions } from "./commands/completions.js";
 
 program
@@ -20,6 +21,12 @@ program
   .command("delete")
   .description("Remove the worktree in the current directory")
   .action(deleteWorktree);
+
+program
+  .command("open")
+  .description("Open an existing worktree in a new iTerm window")
+  .argument("<branch>", "Branch name of the worktree to open")
+  .action(open);
 
 program
   .command("completions")

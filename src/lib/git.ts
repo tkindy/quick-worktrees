@@ -47,3 +47,33 @@ export function getMainWorktreePath(): string {
   const firstLine = output.split("\n")[0];
   return firstLine.replace("worktree ", "");
 }
+
+export interface Worktree {
+  path: string;
+  branch: string | null;
+}
+
+export function listWorktrees(): Worktree[] {
+  const output = execSync("git worktree list --porcelain", { encoding: "utf-8" });
+  const worktrees: Worktree[] = [];
+  let current: Partial<Worktree> = {};
+
+  for (const line of output.split("\n")) {
+    if (line.startsWith("worktree ")) {
+      current.path = line.replace("worktree ", "");
+    } else if (line.startsWith("branch ")) {
+      current.branch = line.replace("branch refs/heads/", "");
+    } else if (line === "") {
+      if (current.path) {
+        worktrees.push({ path: current.path, branch: current.branch ?? null });
+      }
+      current = {};
+    }
+  }
+
+  return worktrees;
+}
+
+export function getWorktreeByBranch(branch: string): Worktree | undefined {
+  return listWorktrees().find((wt) => wt.branch === branch);
+}
