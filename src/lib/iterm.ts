@@ -35,7 +35,32 @@ export function closeCurrentWindow(): void {
   }
 }
 
-export function openInNewWindow(directory: string, setupScript?: string): void {
+export function focusWindowById(windowId: number): boolean {
+  const script = `
+    tell application "iTerm2"
+      repeat with w in windows
+        if id of w is ${windowId} then
+          activate
+          set index of w to 1
+          return "found"
+        end if
+      end repeat
+      return "not_found"
+    end tell
+  `;
+
+  try {
+    const result = execSync(`osascript -e '${script.replace(/'/g, "'\"'\"'")}'`, {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+    return result === "found";
+  } catch {
+    return false;
+  }
+}
+
+export function openInNewWindow(directory: string, setupScript?: string): number | null {
   const escapedDir = directory.replace(/"/g, '\\"');
   const commands = [`cd ${escapedDir}`];
   if (setupScript) {
@@ -45,14 +70,22 @@ export function openInNewWindow(directory: string, setupScript?: string): void {
 
   const script = `
     tell application "iTerm2"
-      create window with default profile
-      tell current session of current window
+      set newWindow to (create window with default profile)
+      tell current session of newWindow
         write text "${commands.join(" && ")}"
       end tell
+      return id of newWindow
     end tell
   `;
 
-  execSync(`osascript -e '${script.replace(/'/g, "'\"'\"'")}'`, {
-    stdio: ["inherit", process.stderr, "inherit"],
-  });
+  try {
+    const result = execSync(`osascript -e '${script.replace(/'/g, "'\"'\"'")}'`, {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+    const windowId = parseInt(result, 10);
+    return isNaN(windowId) ? null : windowId;
+  } catch {
+    return null;
+  }
 }

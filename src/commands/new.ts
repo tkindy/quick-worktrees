@@ -6,6 +6,7 @@ import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
 import { openInNewWindow } from "../lib/iterm.js";
+import { setCachedWindowId } from "../lib/cache.js";
 
 export function newWorktree(ref?: string, options?: { existing?: boolean; branchName?: string }): void {
   const existing = options?.existing;
@@ -68,5 +69,8 @@ export function newWorktree(ref?: string, options?: { existing?: boolean; branch
   const setupScript = config?.scripts?.setup;
 
   console.log(`Opening new iTerm window in: ${worktreePath}`);
-  openInNewWindow(worktreePath, setupScript);
+  const windowId = openInNewWindow(worktreePath, setupScript);
+  if (windowId !== null) {
+    setCachedWindowId(worktreePath, windowId);
+  }
 }

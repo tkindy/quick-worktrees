@@ -1,5 +1,6 @@
 import { getWorktreeByBranch } from "../lib/git.js";
-import { openInNewWindow } from "../lib/iterm.js";
+import { focusWindowById, openInNewWindow } from "../lib/iterm.js";
+import { getCachedWindowId, setCachedWindowId, removeCachedWindow } from "../lib/cache.js";
 
 export function open(branch: string): void {
   const worktree = getWorktreeByBranch(branch);
@@ -9,6 +10,20 @@ export function open(branch: string): void {
     process.exit(1);
   }
 
-  console.log(`Opening iTerm window in: ${worktree.path}`);
-  openInNewWindow(worktree.path);
+  const cachedWindowId = getCachedWindowId(worktree.path);
+
+  if (cachedWindowId !== null && focusWindowById(cachedWindowId)) {
+    console.log(`Focused existing iTerm window for: ${worktree.path}`);
+    return;
+  }
+
+  if (cachedWindowId !== null) {
+    removeCachedWindow(worktree.path);
+  }
+
+  console.log(`Opening new iTerm window in: ${worktree.path}`);
+  const windowId = openInNewWindow(worktree.path);
+  if (windowId !== null) {
+    setCachedWindowId(worktree.path, windowId);
+  }
 }
