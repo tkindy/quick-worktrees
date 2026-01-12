@@ -1,5 +1,6 @@
-import { resolve, dirname } from "node:path";
-import { existsSync } from "node:fs";
+import { resolve, join } from "node:path";
+import { existsSync, mkdirSync } from "node:fs";
+import { homedir } from "node:os";
 import { getRepoRoot, getRepoName, createWorktree, branchExists } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
@@ -22,7 +23,7 @@ export function newWorktree(ref?: string, options?: { existing?: boolean; branch
 
   const repoRoot = getRepoRoot();
   const repoName = getRepoName();
-  const parentDir = dirname(repoRoot);
+  const parentDir = join(homedir(), ".wt", "worktrees", repoName);
 
   const MAX_ATTEMPTS = 5;
   let word: string = "";
@@ -55,6 +56,7 @@ export function newWorktree(ref?: string, options?: { existing?: boolean; branch
 
   const refInfo = ref ? ` from ${ref}` : "";
   console.log(`Creating worktree: ${worktreeName}${refInfo}`);
+  mkdirSync(parentDir, { recursive: true });
   createWorktree(worktreePath, branchName, ref, existing);
 
   const config = loadConfig();
