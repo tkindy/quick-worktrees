@@ -38,6 +38,10 @@ export function getCurrentBranch(): string | null {
   return branch === "HEAD" ? null : branch;
 }
 
+export function detachHead(): void {
+  execSync("git checkout --detach", { stdio: "inherit" });
+}
+
 export function deleteBranch(branchName: string, mainWorktreePath: string): void {
   execSync(`git branch -D "${branchName}"`, { cwd: mainWorktreePath, stdio: "inherit" });
 }

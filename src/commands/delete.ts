@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { getRepoRoot, isWorktree, removeWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, deleteBranch } from "../lib/git.js";
+import { getRepoRoot, isWorktree, removeWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, deleteBranch, detachHead } from "../lib/git.js";
 import { closeCurrentWindow } from "../lib/iterm.js";
 
 function hasWebStormOpen(path: string): boolean {
@@ -70,17 +70,18 @@ export async function deleteWorktree(): Promise<void> {
   const branch = getCurrentBranch();
   const mainWorktreePath = getMainWorktreePath();
 
-  console.log(`Removing worktree: ${worktreePath}`);
-  removeWorktree(worktreePath);
-  console.log("Worktree removed successfully");
-
   if (branch) {
     const deleteBranchConfirmed = await confirm(`Delete branch '${branch}' as well?`);
     if (deleteBranchConfirmed) {
+      detachHead();
       deleteBranch(branch, mainWorktreePath);
       console.log(`Branch '${branch}' deleted`);
     }
   }
+
+  console.log(`Removing worktree: ${worktreePath}`);
+  removeWorktree(worktreePath);
+  console.log("Worktree removed successfully");
 
   if (process.env.ITERM_SESSION_ID) {
     await waitForKey("Press any key to close this window...");
