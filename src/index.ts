@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { program } from "commander";
-import { deleteWorktree } from "./commands/delete.js";
 import { open } from "./commands/open.js";
 import { close } from "./commands/close.js";
 import { completions } from "./commands/completions.js";
@@ -12,11 +11,6 @@ program
   .name("wt")
   .description("Quickly create and manage Git worktrees with random names")
   .version("0.1.0");
-
-program
-  .command("delete")
-  .description("Remove the worktree in the current directory")
-  .action(deleteWorktree);
 
 program
   .command("open")

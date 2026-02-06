@@ -1,7 +1,6 @@
 export function completions(): void {
   const script = `complete --command wt --no-files
 
-complete --command wt --condition "__fish_use_subcommand" --arguments "delete" --description "Remove the worktree in the current directory"
 complete --command wt --condition "__fish_use_subcommand" --arguments "open" --description "Open an existing worktree in a new iTerm window"
 complete --command wt --condition "__fish_use_subcommand" --arguments "close" --description "Close the current iTerm window"
 complete --command wt --condition "__fish_use_subcommand" --arguments "start" --description "Start work on a new task, reusing a worktree if available"

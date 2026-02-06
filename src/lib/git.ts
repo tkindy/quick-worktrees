@@ -28,10 +28,6 @@ export function isWorktree(): boolean {
   return gitDir.includes(".git/worktrees");
 }
 
-export function removeWorktree(worktreePath: string): void {
-  execSync(`git worktree remove "${worktreePath}" --force`, { stdio: "inherit" });
-}
-
 export function hasUncommittedChanges(): boolean {
   const status = execSync("git status --porcelain", { encoding: "utf-8" });
   return status.trim().length > 0;
