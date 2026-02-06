@@ -13,6 +13,13 @@ import { tmpdir } from "node:os";
 import { loadConfig } from "../lib/config.js";
 import { getMainWorktreePath, getRepoRoot, isWorktree } from "../lib/git.js";
 
+function removeNestedGitignores(dir: string): void {
+  execSync(
+    'find . -path ./.git -prune -o -name .gitignore -type f -exec rm {} +',
+    { cwd: dir, stdio: "ignore" }
+  );
+}
+
 export function mergeConfig(): void {
   if (!isWorktree()) {
     console.error("Error: Current directory is not a git worktree");
@@ -49,6 +56,7 @@ export function mergeConfig(): void {
       }
     }
 
+    removeNestedGitignores(tmpDir);
     execSync("git add -A", { cwd: tmpDir, stdio: "ignore" });
     execSync('git commit -q -m "base" --allow-empty', {
       cwd: tmpDir,
@@ -65,6 +73,8 @@ export function mergeConfig(): void {
         rmSync(dest, { recursive: true, force: true });
       }
     }
+
+    removeNestedGitignores(tmpDir);
 
     const status = execSync("git status --porcelain", {
       cwd: tmpDir,
