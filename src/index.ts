@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { program } from "commander";
-import { newWorktree } from "./commands/new.js";
 import { deleteWorktree } from "./commands/delete.js";
 import { open } from "./commands/open.js";
 import { close } from "./commands/close.js";
@@ -12,14 +11,6 @@ program
   .name("wt")
   .description("Quickly create and manage Git worktrees with random names")
   .version("0.1.0");
-
-program
-  .command("new")
-  .description("Create a new worktree with a random name")
-  .argument("[ref]", "Branch name or commit SHA to base the worktree on")
-  .option("-e, --existing", "Checkout an existing branch instead of creating a new one")
-  .option("-b, --branch-name <name>", "Use a custom branch name instead of a random one")
-  .action(newWorktree);
 
 program
   .command("delete")
