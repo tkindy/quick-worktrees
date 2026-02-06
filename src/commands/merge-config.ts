@@ -34,6 +34,13 @@ export function mergeConfig(): void {
     execSync('git config user.email "wt"', { cwd: tmpDir, stdio: "ignore" });
     execSync('git config user.name "wt"', { cwd: tmpDir, stdio: "ignore" });
 
+    // Often the copied files are copied specifically because they're gitignored,
+    // so ignore the ignores
+    execSync("git config core.excludesFile /dev/null", {
+      cwd: tmpDir,
+      stdio: "ignore",
+    });
+
     for (const p of config.copyPaths) {
       const src = join(mainPath, p);
       if (existsSync(src)) {
