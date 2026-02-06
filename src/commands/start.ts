@@ -11,6 +11,7 @@ import { setCachedWindowId } from "../lib/cache.js";
 
 function reuseWorktree(
   worktreePath: string,
+  repoName: string,
   ref: string | undefined,
   existing: boolean | undefined,
   customName: string | undefined,
@@ -27,16 +28,21 @@ function reuseWorktree(
   } else if (customName) {
     branchName = customName;
   } else {
-    do {
-      branchName = generateRandomWord();
-      if (!branchExists(branchName)) break;
-      attempts++;
-    } while (attempts < MAX_ATTEMPTS);
+    const worktreeWord = worktreeName.slice(repoName.length + 1);
+    if (worktreeWord && !branchExists(worktreeWord)) {
+      branchName = worktreeWord;
+    } else {
+      do {
+        branchName = generateRandomWord();
+        if (!branchExists(branchName)) break;
+        attempts++;
+      } while (attempts < MAX_ATTEMPTS);
 
-    if (attempts >= MAX_ATTEMPTS) {
-      console.error(`Error: Could not find an available branch name after ${MAX_ATTEMPTS} attempts.`);
-      console.error("Try specifying a custom branch name with --branch-name.");
-      process.exit(1);
+      if (attempts >= MAX_ATTEMPTS) {
+        console.error(`Error: Could not find an available branch name after ${MAX_ATTEMPTS} attempts.`);
+        console.error("Try specifying a custom branch name with --branch-name.");
+        process.exit(1);
+      }
     }
   }
 
@@ -120,7 +126,7 @@ export function start(ref?: string, options?: { existing?: boolean; branchName?:
   );
 
   const worktreePath = available
-    ? reuseWorktree(available.path, ref, existing, customName)
+    ? reuseWorktree(available.path, repoName, ref, existing, customName)
     : makeNewWorktree(repoName, parentDir, ref, existing, customName);
 
   const config = loadConfig();
