@@ -6,6 +6,7 @@ import { close } from "./commands/close.js";
 import { completions } from "./commands/completions.js";
 import { start } from "./commands/start.js";
 import { finish } from "./commands/finish.js";
+import { mergeConfig } from "./commands/merge-config.js";
 
 program
   .name("wt")
@@ -40,6 +41,11 @@ program
   .command("finish")
   .description("Finish work and release the current worktree for reuse")
   .action(finish);
+
+program
+  .command("merge-config")
+  .description("Interactively merge worktree config changes back to the main repo")
+  .action(mergeConfig);
 
 program
   .command("completions")

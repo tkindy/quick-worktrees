@@ -6,6 +6,7 @@ complete --command wt --condition "__fish_use_subcommand" --arguments "open" --d
 complete --command wt --condition "__fish_use_subcommand" --arguments "close" --description "Close the current iTerm window"
 complete --command wt --condition "__fish_use_subcommand" --arguments "start" --description "Start work on a new task, reusing a worktree if available"
 complete --command wt --condition "__fish_use_subcommand" --arguments "finish" --description "Finish work and release the worktree for reuse"
+complete --command wt --condition "__fish_use_subcommand" --arguments "merge-config" --description "Interactively merge worktree config changes back to the main repo"
 complete --command wt --condition "__fish_use_subcommand" --arguments "completions" --description "Generate Fish shell completions"
 
 complete --command wt --condition "__fish_seen_subcommand_from open" --arguments "(git worktree list --porcelain | string match --regex '(?<=^branch refs/heads/).*')" --description "Worktree branch"
