@@ -5,6 +5,8 @@ import { deleteWorktree } from "./commands/delete.js";
 import { open } from "./commands/open.js";
 import { close } from "./commands/close.js";
 import { completions } from "./commands/completions.js";
+import { start } from "./commands/start.js";
+import { finish } from "./commands/finish.js";
 
 program
   .name("wt")
@@ -34,6 +36,19 @@ program
   .command("close")
   .description("Close the current iTerm window")
   .action(close);
+
+program
+  .command("start")
+  .description("Start work on a new task, reusing an available worktree or creating a new one")
+  .argument("[ref]", "Branch name or commit SHA to base the worktree on")
+  .option("-e, --existing", "Checkout an existing branch instead of creating a new one")
+  .option("-b, --branch-name <name>", "Use a custom branch name instead of a random one")
+  .action(start);
+
+program
+  .command("finish")
+  .description("Finish work and release the current worktree for reuse")
+  .action(finish);
 
 program
   .command("completions")

@@ -90,3 +90,16 @@ export function branchExists(branchName: string): boolean {
     return false;
   }
 }
+
+export function checkoutNewBranch(worktreePath: string, branchName: string, startPoint: string): void {
+  execSync(`git checkout -b "${branchName}" "${startPoint}"`, { cwd: worktreePath, stdio: "inherit" });
+}
+
+export function checkoutBranch(worktreePath: string, branchName: string): void {
+  execSync(`git checkout "${branchName}"`, { cwd: worktreePath, stdio: "inherit" });
+}
+
+export function resetWorktree(worktreePath: string): void {
+  execSync("git reset --hard", { cwd: worktreePath, stdio: "inherit" });
+  execSync("git clean -fd", { cwd: worktreePath, stdio: "inherit" });
+}
