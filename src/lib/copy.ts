@@ -1,5 +1,5 @@
-import { cpSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { cpSync, existsSync, mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 export function copyPaths(
   sourcePath: string,
@@ -15,6 +15,7 @@ export function copyPaths(
     }
 
     console.log(`Copying: ${relativePath}`);
+    mkdirSync(dirname(dest), { recursive: true });
     cpSync(src, dest, { recursive: true });
   }
 }
