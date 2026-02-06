@@ -10,6 +10,10 @@ export function getRepoName(): string {
   return basename(root);
 }
 
+export function getMainRepoName(): string {
+  return basename(getMainWorktreePath());
+}
+
 export function createWorktree(path: string, branchName: string, ref?: string, existing?: boolean): void {
   if (existing) {
     execSync(`git worktree add "${path}" "${ref}"`, { stdio: "inherit" });

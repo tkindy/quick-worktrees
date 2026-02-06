@@ -2,7 +2,7 @@ import { resolve, join } from "node:path";
 import { existsSync, mkdirSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { homedir } from "node:os";
-import { getRepoRoot, getRepoName, listWorktrees, branchExists, checkoutNewBranch, checkoutBranch, createWorktree } from "../lib/git.js";
+import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, checkoutNewBranch, checkoutBranch, createWorktree } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
@@ -110,8 +110,8 @@ export function start(ref?: string, options?: { existing?: boolean; branchName?:
     process.exit(1);
   }
 
-  const repoRoot = getRepoRoot();
-  const repoName = getRepoName();
+  const repoRoot = getMainWorktreePath();
+  const repoName = getMainRepoName();
   const parentDir = join(homedir(), ".wt", "worktrees", repoName);
 
   const worktrees = listWorktrees();
