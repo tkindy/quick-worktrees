@@ -4,6 +4,7 @@ import { close } from "./commands/close.js";
 import { completions } from "./commands/completions.js";
 import { start } from "./commands/start.js";
 import { finish } from "./commands/finish.js";
+import { list } from "./commands/list.js";
 import { mergeConfig } from "./commands/merge-config.js";
 
 program
@@ -28,6 +29,11 @@ program
   .command("finish")
   .description("Finish work and release the current worktree for reuse")
   .action(finish);
+
+program
+  .command("list")
+  .description("List worktrees for the current repo")
+  .action(list);
 
 program
   .command("merge-config")
