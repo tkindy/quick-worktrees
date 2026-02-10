@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { program } from "commander";
-import { open } from "./commands/open.js";
 import { close } from "./commands/close.js";
 import { completions } from "./commands/completions.js";
 import { start } from "./commands/start.js";
@@ -11,12 +10,6 @@ program
   .name("wt")
   .description("Quickly create and manage Git worktrees with random names")
   .version("0.1.0");
-
-program
-  .command("open")
-  .description("Open an existing worktree in a new iTerm window")
-  .argument("<branch>", "Branch name of the worktree to open")
-  .action(open);
 
 program
   .command("close")

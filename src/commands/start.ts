@@ -2,12 +2,12 @@ import { resolve, join } from "node:path";
 import { existsSync, mkdirSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { homedir } from "node:os";
-import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, checkoutNewBranch, checkoutBranch, createWorktree } from "../lib/git.js";
+import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, checkoutNewBranch, checkoutBranch, createWorktree, getWorktreeByBranch } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
-import { openInNewWindow } from "../lib/iterm.js";
-import { setCachedWindowId } from "../lib/cache.js";
+import { focusWindowById, openInNewWindow } from "../lib/iterm.js";
+import { getCachedWindowId, setCachedWindowId, removeCachedWindow } from "../lib/cache.js";
 
 function reuseWorktree(
   worktreePath: string,
@@ -102,6 +102,29 @@ function makeNewWorktree(
   return worktreePath;
 }
 
+function openExistingWorktree(branch: string): boolean {
+  const worktree = getWorktreeByBranch(branch);
+  if (!worktree) return false;
+
+  const cachedWindowId = getCachedWindowId(worktree.path);
+
+  if (cachedWindowId !== null && focusWindowById(cachedWindowId)) {
+    console.log(`Focused existing iTerm window for: ${worktree.path}`);
+    return true;
+  }
+
+  if (cachedWindowId !== null) {
+    removeCachedWindow(worktree.path);
+  }
+
+  console.log(`Opening new iTerm window in: ${worktree.path}`);
+  const windowId = openInNewWindow(worktree.path);
+  if (windowId !== null) {
+    setCachedWindowId(worktree.path, windowId);
+  }
+  return true;
+}
+
 export function start(ref?: string, options?: { existing?: boolean; branchName?: string }): void {
   const existing = options?.existing;
   const customName = options?.branchName;
@@ -114,6 +137,10 @@ export function start(ref?: string, options?: { existing?: boolean; branchName?:
   if (existing && customName) {
     console.error("Error: --existing and --branch-name are mutually exclusive");
     process.exit(1);
+  }
+
+  if (existing && openExistingWorktree(ref!)) {
+    return;
   }
 
   const repoRoot = getMainWorktreePath();
