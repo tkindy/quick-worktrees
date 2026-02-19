@@ -143,6 +143,11 @@ export function start(ref?: string, options?: { existing?: boolean; branchName?:
     return;
   }
 
+  if (existing && !branchExists(ref!)) {
+    console.error(`Error: Branch '${ref}' does not exist`);
+    process.exit(1);
+  }
+
   const repoRoot = getMainWorktreePath();
   const repoName = getMainRepoName();
   const parentDir = join(homedir(), ".wt", "worktrees", repoName);
