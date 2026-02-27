@@ -7,7 +7,7 @@
     "wt": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/completions.fish dist/",
     "dev": "tsx src/index.ts"
   },
   "devDependencies": {
