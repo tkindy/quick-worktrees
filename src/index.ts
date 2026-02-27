@@ -6,6 +6,7 @@ import { start } from "./commands/start.js";
 import { finish } from "./commands/finish.js";
 import { list } from "./commands/list.js";
 import { mergeConfig } from "./commands/merge-config.js";
+import { open } from "./commands/open.js";
 
 program
   .name("wt")
@@ -29,6 +30,12 @@ program
   .command("finish")
   .description("Finish work and release the current worktree for reuse")
   .action(finish);
+
+program
+  .command("open")
+  .description("Open an existing worktree in iTerm")
+  .argument("<name>", "Worktree directory name or branch name")
+  .action(open);
 
 program
   .command("list")

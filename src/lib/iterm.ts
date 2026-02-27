@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import { getCachedWindowId, setCachedWindowId, removeCachedWindow } from "./cache.js";
 
 export function closeCurrentWindow(): void {
   const sessionId = process.env.ITERM_SESSION_ID;
@@ -87,5 +88,24 @@ export function openInNewWindow(directory: string, setupScript?: string): number
     return isNaN(windowId) ? null : windowId;
   } catch {
     return null;
+  }
+}
+
+export function focusOrOpenWorktree(worktreePath: string): void {
+  const cachedWindowId = getCachedWindowId(worktreePath);
+
+  if (cachedWindowId !== null && focusWindowById(cachedWindowId)) {
+    console.log(`Focused existing iTerm window for: ${worktreePath}`);
+    return;
+  }
+
+  if (cachedWindowId !== null) {
+    removeCachedWindow(worktreePath);
+  }
+
+  console.log(`Opening new iTerm window in: ${worktreePath}`);
+  const windowId = openInNewWindow(worktreePath);
+  if (windowId !== null) {
+    setCachedWindowId(worktreePath, windowId);
   }
 }

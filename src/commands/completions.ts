@@ -5,8 +5,12 @@ complete --command wt --condition "__fish_use_subcommand" --arguments "close" --
 complete --command wt --condition "__fish_use_subcommand" --arguments "start" --description "Start work on a new task, reusing a worktree if available"
 complete --command wt --condition "__fish_use_subcommand" --arguments "finish" --description "Finish work and release the worktree for reuse"
 complete --command wt --condition "__fish_use_subcommand" --arguments "merge-config" --description "Interactively merge worktree config changes back to the main repo"
+complete --command wt --condition "__fish_use_subcommand" --arguments "open" --description "Open an existing worktree in iTerm"
 complete --command wt --condition "__fish_use_subcommand" --arguments "list" --description "List worktrees for the current repo"
 complete --command wt --condition "__fish_use_subcommand" --arguments "completions" --description "Generate Fish shell completions"
+
+complete --command wt --condition "__fish_seen_subcommand_from open" --arguments "(wt list 2>/dev/null | string replace --regex --filter '(\\S+)\\s+.*' '$1')" --description "Directory"
+complete --command wt --condition "__fish_seen_subcommand_from open" --arguments "(wt list 2>/dev/null | string replace --regex --filter '\\S+\\s+(\\S+)' '$1' | string match --invert '(available)')" --description "Branch"
 
 complete --command wt --condition "__fish_seen_subcommand_from start" --arguments "(git branch --format='%(refname:short)')" --description "Branch"
 complete --command wt --condition "__fish_seen_subcommand_from start" --short-option e --long-option existing --description "Checkout an existing branch instead of creating a new one"

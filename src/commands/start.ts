@@ -6,8 +6,8 @@ import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, chec
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
-import { focusWindowById, openInNewWindow } from "../lib/iterm.js";
-import { getCachedWindowId, setCachedWindowId, removeCachedWindow } from "../lib/cache.js";
+import { focusOrOpenWorktree, openInNewWindow } from "../lib/iterm.js";
+import { setCachedWindowId } from "../lib/cache.js";
 
 function reuseWorktree(
   worktreePath: string,
@@ -106,22 +106,7 @@ function openExistingWorktree(branch: string): boolean {
   const worktree = getWorktreeByBranch(branch);
   if (!worktree) return false;
 
-  const cachedWindowId = getCachedWindowId(worktree.path);
-
-  if (cachedWindowId !== null && focusWindowById(cachedWindowId)) {
-    console.log(`Focused existing iTerm window for: ${worktree.path}`);
-    return true;
-  }
-
-  if (cachedWindowId !== null) {
-    removeCachedWindow(worktree.path);
-  }
-
-  console.log(`Opening new iTerm window in: ${worktree.path}`);
-  const windowId = openInNewWindow(worktree.path);
-  if (windowId !== null) {
-    setCachedWindowId(worktree.path, windowId);
-  }
+  focusOrOpenWorktree(worktree.path);
   return true;
 }
 
