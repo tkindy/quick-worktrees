@@ -91,6 +91,21 @@ export function branchExists(branchName: string): boolean {
   }
 }
 
+export function findRemoteBranch(branchName: string): string | null {
+  const output = execSync(
+    `git for-each-ref --format="%(refname:short)" "refs/remotes/*/${branchName}"`,
+    { encoding: "utf-8" },
+  ).trim();
+  if (!output) return null;
+  const matches = output.split("\n").filter((line) => line.endsWith(`/${branchName}`));
+  if (matches.length !== 1) return null;
+  return matches[0];
+}
+
+export function createTrackingBranch(branchName: string, remoteBranch: string): void {
+  execSync(`git branch --track "${branchName}" "${remoteBranch}"`, { stdio: "inherit" });
+}
+
 export function checkoutNewBranch(worktreePath: string, branchName: string, startPoint: string): void {
   execSync(`git checkout -b "${branchName}" "${startPoint}"`, { cwd: worktreePath, stdio: "inherit" });
 }
