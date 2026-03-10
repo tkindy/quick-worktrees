@@ -28,7 +28,8 @@ program
 
 program
   .command("finish")
-  .description("Finish work and release the current worktree for reuse")
+  .description("Finish work and release a worktree for reuse")
+  .argument("[name]", "Worktree directory name or branch name (defaults to current directory)")
   .action(finish);
 
 program

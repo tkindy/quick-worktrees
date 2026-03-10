@@ -1,8 +1,8 @@
 import { execSync } from "node:child_process";
 import { basename } from "node:path";
 
-export function getRepoRoot(): string {
-  return execSync("git rev-parse --show-toplevel", { encoding: "utf-8" }).trim();
+export function getRepoRoot(cwd?: string): string {
+  return execSync("git rev-parse --show-toplevel", { encoding: "utf-8", cwd }).trim();
 }
 
 export function getRepoName(): string {
@@ -23,31 +23,31 @@ export function createWorktree(path: string, branchName: string, ref?: string, e
   }
 }
 
-export function isWorktree(): boolean {
-  const gitDir = execSync("git rev-parse --git-dir", { encoding: "utf-8" }).trim();
+export function isWorktree(cwd?: string): boolean {
+  const gitDir = execSync("git rev-parse --git-dir", { encoding: "utf-8", cwd }).trim();
   return gitDir.includes(".git/worktrees");
 }
 
-export function hasUncommittedChanges(): boolean {
-  const status = execSync("git status --porcelain", { encoding: "utf-8" });
+export function hasUncommittedChanges(cwd?: string): boolean {
+  const status = execSync("git status --porcelain", { encoding: "utf-8", cwd });
   return status.trim().length > 0;
 }
 
-export function getCurrentBranch(): string | null {
-  const branch = execSync("git rev-parse --abbrev-ref HEAD", { encoding: "utf-8" }).trim();
+export function getCurrentBranch(cwd?: string): string | null {
+  const branch = execSync("git rev-parse --abbrev-ref HEAD", { encoding: "utf-8", cwd }).trim();
   return branch === "HEAD" ? null : branch;
 }
 
-export function detachHead(): void {
-  execSync("git checkout --detach", { stdio: "inherit" });
+export function detachHead(cwd?: string): void {
+  execSync("git checkout --detach", { stdio: "inherit", cwd });
 }
 
 export function deleteBranch(branchName: string, mainWorktreePath: string): void {
   execSync(`git branch -D "${branchName}"`, { cwd: mainWorktreePath, stdio: "inherit" });
 }
 
-export function getMainWorktreePath(): string {
-  const output = execSync("git worktree list --porcelain", { encoding: "utf-8" });
+export function getMainWorktreePath(cwd?: string): string {
+  const output = execSync("git worktree list --porcelain", { encoding: "utf-8", cwd });
   const firstLine = output.split("\n")[0];
   return firstLine.replace("worktree ", "");
 }
