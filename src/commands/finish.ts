@@ -3,6 +3,12 @@ import { homedir } from "node:os";
 import { getRepoRoot, isWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, getMainRepoName, deleteBranch, detachHead, resetWorktree, listWorktrees } from "../lib/git.js";
 import { closeCurrentWindow } from "../lib/iterm.js";
 import { removeCachedWindow } from "../lib/cache.js";
+import { loadConfig } from "../lib/config.js";
+import {
+  getConfigDiffStat,
+  runPatchApprovalFlow,
+  cleanupTmpDir,
+} from "../lib/config-diff.js";
 
 function waitForKey(message: string): Promise<void> {
   return new Promise((resolve) => {
@@ -70,8 +76,33 @@ export async function finish(name?: string): Promise<void> {
     }
   }
 
-  const branch = getCurrentBranch(worktreePath);
   const mainWorktreePath = getMainWorktreePath(worktreePath);
+
+  const config = loadConfig();
+  if (config?.copyPaths?.length) {
+    const result = getConfigDiffStat(
+      mainWorktreePath,
+      worktreePath,
+      config.copyPaths
+    );
+    if (result) {
+      const { tmpDir, diffStat } = result;
+      try {
+        console.log("\nConfig changes detected:\n");
+        console.log(diffStat);
+        const mergeConfirmed = await confirm(
+          "Merge config changes back to main worktree?"
+        );
+        if (mergeConfirmed) {
+          runPatchApprovalFlow(tmpDir, mainWorktreePath);
+        }
+      } finally {
+        cleanupTmpDir(tmpDir);
+      }
+    }
+  }
+
+  const branch = getCurrentBranch(worktreePath);
 
   if (branch) {
     detachHead(worktreePath);
