@@ -1,7 +1,6 @@
 import { execSync, spawnSync } from "node:child_process";
 import {
   mkdtempSync,
-  cpSync,
   existsSync,
   mkdirSync,
   writeFileSync,
@@ -10,6 +9,8 @@ import {
 } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
+import type { CopyPathEntry } from "../types.js";
+import { copyPaths } from "./copy.js";
 
 function removeNestedGitignores(dir: string): void {
   execSync(
@@ -21,7 +22,7 @@ function removeNestedGitignores(dir: string): void {
 function createConfigDiffRepo(
   mainPath: string,
   worktreePath: string,
-  copyPaths: string[]
+  paths: (string | CopyPathEntry)[],
 ): { tmpDir: string; hasChanges: boolean } {
   const tmpDir = mkdtempSync(join(tmpdir(), "wt-merge-config-"));
 
@@ -33,13 +34,7 @@ function createConfigDiffRepo(
     stdio: "ignore",
   });
 
-  for (const p of copyPaths) {
-    const src = join(mainPath, p);
-    if (existsSync(src)) {
-      const dest = join(tmpDir, p);
-      cpSync(src, dest, { recursive: true });
-    }
-  }
+  copyPaths(mainPath, tmpDir, paths, { quiet: true });
 
   removeNestedGitignores(tmpDir);
   execSync("git add -A", { cwd: tmpDir, stdio: "ignore" });
@@ -48,16 +43,14 @@ function createConfigDiffRepo(
     stdio: "ignore",
   });
 
-  for (const p of copyPaths) {
-    const src = join(worktreePath, p);
+  for (const entry of paths) {
+    const p = typeof entry === "string" ? entry : entry.path;
     const dest = join(tmpDir, p);
-
-    if (existsSync(src)) {
-      cpSync(src, dest, { recursive: true });
-    } else if (existsSync(dest)) {
+    if (existsSync(dest)) {
       rmSync(dest, { recursive: true, force: true });
     }
   }
+  copyPaths(worktreePath, tmpDir, paths, { quiet: true });
 
   removeNestedGitignores(tmpDir);
 
@@ -72,12 +65,12 @@ function createConfigDiffRepo(
 export function getConfigDiffStat(
   mainPath: string,
   worktreePath: string,
-  copyPaths: string[]
+  paths: (string | CopyPathEntry)[],
 ): { tmpDir: string; diffStat: string } | null {
   const { tmpDir, hasChanges } = createConfigDiffRepo(
     mainPath,
     worktreePath,
-    copyPaths
+    paths,
   );
 
   if (!hasChanges) {

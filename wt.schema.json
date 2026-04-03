@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "wt.json",
+  "description": "Configuration for the wt (quick-worktrees) CLI tool",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "scripts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "setup": {
+          "type": "string",
+          "description": "Shell command to run in the new worktree's iTerm window after creation"
+        }
+      }
+    },
+    "copyPaths": {
+      "type": "array",
+      "description": "Paths to copy from the main worktree to new worktrees",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "A path to copy recursively"
+          },
+          {
+            "$ref": "#/$defs/copyPathEntry"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "copyPathEntry": {
+      "type": "object",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative path within the worktree"
+        },
+        "mode": {
+          "default": "copy",
+          "oneOf": [
+            {
+              "const": "copy",
+              "description": "Copy this path recursively (default)"
+            },
+            {
+              "const": "exclude",
+              "description": "Skip this path when copying and syncing"
+            },
+            {
+              "const": "clear-first",
+              "description": "Delete existing contents of this directory before processing children"
+            }
+          ]
+        },
+        "children": {
+          "type": "array",
+          "description": "Child paths to process within this directory",
+          "items": {
+            "$ref": "#/$defs/copyPathEntry"
+          }
+        }
+      }
+    }
+  }
+}
