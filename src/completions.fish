@@ -3,6 +3,7 @@ complete --command wt --no-files
 complete --command wt --condition "__fish_use_subcommand" --arguments "close" --description "Close the current iTerm window"
 complete --command wt --condition "__fish_use_subcommand" --arguments "start" --description "Start work on a new task, reusing a worktree if available"
 complete --command wt --condition "__fish_use_subcommand" --arguments "finish" --description "Finish work and release the worktree for reuse"
+complete --command wt --condition "__fish_use_subcommand" --arguments "refresh" --description "Rerun the setup script in the current worktree"
 complete --command wt --condition "__fish_use_subcommand" --arguments "merge-config" --description "Interactively merge worktree config changes back to the main repo"
 complete --command wt --condition "__fish_use_subcommand" --arguments "open" --description "Open an existing worktree in iTerm"
 complete --command wt --condition "__fish_use_subcommand" --arguments "list" --description "List worktrees for the current repo"

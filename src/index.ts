@@ -7,6 +7,7 @@ import { finish } from "./commands/finish.js";
 import { list } from "./commands/list.js";
 import { mergeConfig } from "./commands/merge-config.js";
 import { open } from "./commands/open.js";
+import { refresh } from "./commands/refresh.js";
 
 program
   .name("wt")
@@ -42,6 +43,11 @@ program
   .command("list")
   .description("List worktrees for the current repo")
   .action(list);
+
+program
+  .command("refresh")
+  .description("Rerun the setup script in the current worktree")
+  .action(refresh);
 
 program
   .command("merge-config")
