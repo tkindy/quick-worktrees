@@ -59,7 +59,8 @@ function resolveWorktreePath(name: string): string {
   return worktree.path;
 }
 
-export async function finish(name?: string): Promise<void> {
+export async function finish(name?: string, options?: { force?: boolean }): Promise<void> {
+  const force = options?.force ?? false;
   const remote = name !== undefined;
   const worktreePath = remote ? resolveWorktreePath(name) : getRepoRoot();
 
@@ -69,35 +70,44 @@ export async function finish(name?: string): Promise<void> {
   }
 
   if (hasUncommittedChanges(worktreePath)) {
-    const confirmed = await confirm("Worktree has uncommitted changes. Discard them?");
-    if (!confirmed) {
-      console.log("Aborted");
-      return;
+    if (force) {
+      console.log("Discarding uncommitted changes");
+    } else {
+      const confirmed = await confirm("Worktree has uncommitted changes. Discard them?");
+      if (!confirmed) {
+        console.log("Aborted");
+        return;
+      }
     }
   }
 
   const mainWorktreePath = getMainWorktreePath(worktreePath);
 
-  const config = loadConfig();
-  if (config?.copyPaths?.length) {
-    const result = getConfigDiffStat(
-      mainWorktreePath,
-      worktreePath,
-      config.copyPaths
-    );
-    if (result) {
-      const { tmpDir, diffStat } = result;
-      try {
-        console.log("\nConfig changes detected:\n");
-        console.log(diffStat);
-        const mergeConfirmed = await confirm(
-          "Merge config changes back to main worktree?"
-        );
-        if (mergeConfirmed) {
-          runPatchApprovalFlow(tmpDir, mainWorktreePath);
+  if (!force) {
+    const config = loadConfig();
+    if (config?.copyPaths?.length) {
+      const result = getConfigDiffStat(
+        mainWorktreePath,
+        worktreePath,
+        config.copyPaths
+      );
+      if (result) {
+        const { tmpDir, diffStat, hasConflicts } = result;
+        try {
+          console.log("\nConfig changes detected:\n");
+          console.log(diffStat);
+          if (hasConflicts) {
+            console.log("Note: Conflicts with main worktree config detected");
+          }
+          const mergeConfirmed = await confirm(
+            "Merge config changes back to main worktree?"
+          );
+          if (mergeConfirmed) {
+            runPatchApprovalFlow(tmpDir, mainWorktreePath, hasConflicts);
+          }
+        } finally {
+          cleanupTmpDir(tmpDir);
         }
-      } finally {
-        cleanupTmpDir(tmpDir);
       }
     }
   }
@@ -107,10 +117,15 @@ export async function finish(name?: string): Promise<void> {
   if (branch) {
     detachHead(worktreePath);
 
-    const deleteBranchConfirmed = await confirm(`Delete branch '${branch}'?`);
-    if (deleteBranchConfirmed) {
+    if (force) {
       deleteBranch(branch, mainWorktreePath);
       console.log(`Branch '${branch}' deleted`);
+    } else {
+      const deleteBranchConfirmed = await confirm(`Delete branch '${branch}'?`);
+      if (deleteBranchConfirmed) {
+        deleteBranch(branch, mainWorktreePath);
+        console.log(`Branch '${branch}' deleted`);
+      }
     }
   }
 

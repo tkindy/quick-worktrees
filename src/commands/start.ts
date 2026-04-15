@@ -6,6 +6,7 @@ import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, chec
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
+import { saveConfigBase } from "../lib/config-base.js";
 import { focusOrOpenWorktree, openInNewWindow } from "../lib/iterm.js";
 import { setCachedWindowId } from "../lib/cache.js";
 
@@ -155,6 +156,7 @@ export function start(ref?: string, options?: { existing?: boolean; branchName?:
 
   if (config?.copyPaths?.length) {
     copyPaths(repoRoot, worktreePath, config.copyPaths);
+    saveConfigBase(repoRoot, worktreePath, config.copyPaths);
   }
 
   const setupScript = config?.scripts?.setup;

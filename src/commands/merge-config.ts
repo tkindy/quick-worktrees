@@ -27,11 +27,14 @@ export function mergeConfig(): void {
     return;
   }
 
-  const { tmpDir, diffStat } = result;
+  const { tmpDir, diffStat, hasConflicts } = result;
 
   try {
     console.log(diffStat);
-    runPatchApprovalFlow(tmpDir, mainPath);
+    if (hasConflicts) {
+      console.log("Note: Conflicts with main worktree config detected");
+    }
+    runPatchApprovalFlow(tmpDir, mainPath, hasConflicts);
   } finally {
     cleanupTmpDir(tmpDir);
   }

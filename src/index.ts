@@ -31,6 +31,7 @@ program
   .command("finish")
   .description("Finish work and release a worktree for reuse")
   .argument("[name]", "Worktree directory name or branch name (defaults to current directory)")
+  .option("-f, --force", "Skip prompts, discard changes, and delete the branch")
   .action(finish);
 
 program
