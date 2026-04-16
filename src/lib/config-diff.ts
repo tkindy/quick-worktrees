@@ -4,6 +4,7 @@ import {
   existsSync,
   mkdirSync,
   writeFileSync,
+  readFileSync,
   rmSync,
   unlinkSync,
 } from "node:fs";
@@ -173,15 +174,32 @@ export function runPatchApprovalFlow(
 ): number {
   if (hasConflicts) {
     console.log("\nConflicts detected — opening editor to resolve...");
-    const files = execSync("git diff --name-only --diff-filter=U", {
+    const conflictedFiles = execSync("git diff --name-only --diff-filter=U", {
       cwd: tmpDir,
       encoding: "utf-8",
-    }).trim();
-    for (const file of files.split("\n")) {
-      spawnSync(process.env.EDITOR ?? "vim", [file], {
+    }).trim().split("\n");
+    const editorCmd = process.env.EDITOR ?? "vim";
+    const [editorBin, ...editorArgs] = editorCmd.split(/\s+/);
+    for (const file of conflictedFiles) {
+      const result = spawnSync(editorBin, [...editorArgs, file], {
         cwd: tmpDir,
         stdio: "inherit",
       });
+      if (result.error) {
+        throw new Error(`Failed to open editor '${editorBin}': ${result.error.message}`);
+      }
+      if (result.status !== 0) {
+        throw new Error(`Editor '${editorBin}' exited with status ${result.status}`);
+      }
+    }
+    const conflictMarker = /^<{7} /m;
+    const unresolved = conflictedFiles.filter((file) =>
+      conflictMarker.test(readFileSync(join(tmpDir, file), "utf-8"))
+    );
+    if (unresolved.length > 0) {
+      throw new Error(
+        `Conflict markers remain in: ${unresolved.join(", ")}`
+      );
     }
     execSync("git add -A", { cwd: tmpDir, stdio: "ignore" });
     execSync('git commit -q -m "resolved" --no-edit', {
