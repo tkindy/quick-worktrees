@@ -1,6 +1,6 @@
 import { basename, join } from "node:path";
 import { homedir } from "node:os";
-import { getRepoRoot, isWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, getMainRepoName, deleteBranch, detachHead, resetWorktree, listWorktrees } from "../lib/git.js";
+import { getRepoRoot, isWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, getMainRepoName, deleteBranch, detachHead, resetWorktree, listWorktrees, isGraphiteManaged, getDefaultBranch, branchHasCommitsBeyond } from "../lib/git.js";
 import { closeCurrentWindow } from "../lib/iterm.js";
 import { removeCachedWindow } from "../lib/cache.js";
 import { loadConfig } from "../lib/config.js";
@@ -39,6 +39,34 @@ function confirm(message: string): Promise<boolean> {
   });
 }
 
+async function decideBranchDeletion(
+  branch: string,
+  mainWorktreePath: string,
+  force: boolean,
+  keepBranch: boolean,
+): Promise<boolean> {
+  if (force) return true;
+  if (keepBranch) return false;
+
+  if (isGraphiteManaged(branch, mainWorktreePath)) {
+    console.log(`Keeping Graphite-managed branch '${branch}'`);
+    return false;
+  }
+
+  const defaultBranch = getDefaultBranch(mainWorktreePath);
+  if (
+    defaultBranch &&
+    !branchHasCommitsBeyond(branch, defaultBranch, mainWorktreePath)
+  ) {
+    console.log(
+      `Branch '${branch}' has no new commits beyond '${defaultBranch}', deleting`,
+    );
+    return true;
+  }
+
+  return confirm(`Delete branch '${branch}'?`);
+}
+
 function resolveWorktreePath(name: string): string {
   const repoName = getMainRepoName();
   const parentDir = join(homedir(), ".wt", "worktrees", repoName);
@@ -59,8 +87,18 @@ function resolveWorktreePath(name: string): string {
   return worktree.path;
 }
 
-export async function finish(name?: string, options?: { force?: boolean }): Promise<void> {
+export async function finish(
+  name?: string,
+  options?: { force?: boolean; keepBranch?: boolean },
+): Promise<void> {
   const force = options?.force ?? false;
+  const keepBranch = options?.keepBranch ?? false;
+
+  if (force && keepBranch) {
+    console.error("Error: --force and --keep-branch are mutually exclusive");
+    process.exit(1);
+  }
+
   const remote = name !== undefined;
   const worktreePath = remote ? resolveWorktreePath(name) : getRepoRoot();
 
@@ -117,15 +155,15 @@ export async function finish(name?: string, options?: { force?: boolean }): Prom
   if (branch) {
     detachHead(worktreePath);
 
-    if (force) {
+    const shouldDelete = await decideBranchDeletion(
+      branch,
+      mainWorktreePath,
+      force,
+      keepBranch,
+    );
+    if (shouldDelete) {
       deleteBranch(branch, mainWorktreePath);
       console.log(`Branch '${branch}' deleted`);
-    } else {
-      const deleteBranchConfirmed = await confirm(`Delete branch '${branch}'?`);
-      if (deleteBranchConfirmed) {
-        deleteBranch(branch, mainWorktreePath);
-        console.log(`Branch '${branch}' deleted`);
-      }
     }
   }
 

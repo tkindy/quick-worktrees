@@ -12,6 +12,7 @@ complete --command wt --condition "__fish_use_subcommand" --arguments "completio
 complete --command wt --condition "__fish_seen_subcommand_from open" --arguments "(wt list 2>/dev/null | string replace --regex --filter '(\\S+)\\s+(.+)' '\$1\t\$2' | string match --invert --regex '\\(available\\)')" --description "Worktree"
 complete --command wt --condition "__fish_seen_subcommand_from finish" --arguments "(wt list 2>/dev/null | string replace --regex --filter '(\\S+)\\s+(.+)' '\$1\t\$2' | string match --invert --regex '\\(available\\)')" --description "Worktree"
 complete --command wt --condition "__fish_seen_subcommand_from finish" --short-option f --long-option force --description "Skip prompts, discard changes, and delete the branch"
+complete --command wt --condition "__fish_seen_subcommand_from finish" --short-option k --long-option keep-branch --description "Keep the branch instead of deleting it"
 
 complete --command wt --condition "__fish_seen_subcommand_from start" --arguments "(git branch --format='%(refname:short)')" --description "Branch"
 complete --command wt --condition "__fish_seen_subcommand_from start" --short-option e --long-option existing --description "Checkout an existing branch instead of creating a new one"

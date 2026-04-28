@@ -118,3 +118,50 @@ export function resetWorktree(worktreePath: string): void {
   execSync("git reset --hard", { cwd: worktreePath, stdio: "inherit" });
   execSync("git clean -fd", { cwd: worktreePath, stdio: "inherit" });
 }
+
+export function isGraphiteManaged(branch: string, cwd?: string): boolean {
+  try {
+    execSync(`gt info "${branch}"`, {
+      stdio: "ignore",
+      cwd,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function getDefaultBranch(cwd?: string): string | null {
+  try {
+    const ref = execSync("git symbolic-ref --short refs/remotes/origin/HEAD", {
+      encoding: "utf-8",
+      cwd,
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    if (ref.startsWith("origin/")) return ref.slice("origin/".length);
+  } catch {}
+
+  for (const candidate of ["main", "master"]) {
+    try {
+      execSync(`git rev-parse --verify "refs/heads/${candidate}"`, {
+        stdio: "ignore",
+        cwd,
+      });
+      return candidate;
+    } catch {}
+  }
+
+  return null;
+}
+
+export function branchHasCommitsBeyond(
+  branch: string,
+  baseBranch: string,
+  cwd?: string,
+): boolean {
+  const count = execSync(
+    `git rev-list --count "${baseBranch}..${branch}"`,
+    { encoding: "utf-8", cwd },
+  ).trim();
+  return parseInt(count, 10) > 0;
+}
