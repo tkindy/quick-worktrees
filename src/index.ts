@@ -22,7 +22,7 @@ program
 program
   .command("start")
   .description("Start work on a new task, reusing an available worktree or creating a new one")
-  .argument("[ref]", "Branch name or commit SHA to base the worktree on")
+  .argument("[ref]", "Branch name or commit SHA to base the worktree on (defaults to the repo's default branch)")
   .option("-e, --existing", "Checkout an existing branch instead of creating a new one")
   .option("-b, --branch-name <name>", "Use a custom branch name instead of a random one")
   .action(start);

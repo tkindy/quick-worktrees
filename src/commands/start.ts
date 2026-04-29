@@ -2,7 +2,7 @@ import { resolve, join } from "node:path";
 import { existsSync, mkdirSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { homedir } from "node:os";
-import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, checkoutNewBranch, checkoutBranch, createWorktree, getWorktreeByBranch, findRemoteBranch, createTrackingBranch } from "../lib/git.js";
+import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, checkoutNewBranch, checkoutBranch, createWorktree, getWorktreeByBranch, findRemoteBranch, createTrackingBranch, getDefaultBranch } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
@@ -137,6 +137,10 @@ export function start(ref?: string, options?: { existing?: boolean; branchName?:
     }
     console.log(`Creating local branch '${ref}' tracking '${remoteBranch}'`);
     createTrackingBranch(ref!, remoteBranch);
+  }
+
+  if (!existing && !ref) {
+    ref = getDefaultBranch() ?? undefined;
   }
 
   const repoRoot = getMainWorktreePath();
