@@ -30,3 +30,5 @@ CLI tool (`wt`) for quickly creating git worktrees with random nature-themed nam
 ## Guidelines
 
 When adding, editing, or removing CLI commands, update the shell completions in `commands/completions.ts` to reflect those changes.
+
+After making some changes, commit them. Use concise commit messages and NEVER reference yourself as an author, committer, etc. in the commit trailers.
