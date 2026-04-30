@@ -1,6 +1,6 @@
 import { basename, join } from "node:path";
 import { homedir } from "node:os";
-import { getMainRepoName, listWorktrees } from "../lib/git.js";
+import { getMainRepoName, isWorktreeAvailable, listWorktrees } from "../lib/git.js";
 
 export function list(): void {
   const repoName = getMainRepoName();
@@ -15,8 +15,13 @@ export function list(): void {
     return;
   }
 
-  const active = worktrees.filter((wt) => wt.branch !== null);
-  const available = worktrees.filter((wt) => wt.branch === null);
+  const annotated = worktrees.map((wt) => ({
+    ...wt,
+    available: isWorktreeAvailable(wt.path),
+  }));
+
+  const active = annotated.filter((wt) => !wt.available);
+  const available = annotated.filter((wt) => wt.available);
   const all = [...active, ...available];
 
   const names = all.map((wt) => basename(wt.path));
@@ -24,7 +29,10 @@ export function list(): void {
 
   for (let i = 0; i < all.length; i++) {
     if (i === active.length && active.length > 0) console.log();
-    const status = all[i].branch ?? "(available)";
+    const wt = all[i];
+    const status = wt.available
+      ? "(available)"
+      : wt.branch ?? "(detached)";
     console.log(`${names[i].padEnd(maxLen)}  ${status}`);
   }
 }

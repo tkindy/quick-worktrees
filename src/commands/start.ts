@@ -2,7 +2,7 @@ import { resolve, join } from "node:path";
 import { existsSync, mkdirSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { homedir } from "node:os";
-import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, checkoutNewBranch, checkoutBranch, createWorktree, getWorktreeByBranch, findRemoteBranch, createTrackingBranch, getDefaultBranch } from "../lib/git.js";
+import { getMainWorktreePath, getMainRepoName, listWorktrees, branchExists, checkoutNewBranch, checkoutBranch, createWorktree, getWorktreeByBranch, findRemoteBranch, createTrackingBranch, getDefaultBranch, isWorktreeAvailable, markWorktreeInUse } from "../lib/git.js";
 import { generateRandomWord } from "../lib/names.js";
 import { loadConfig } from "../lib/config.js";
 import { copyPaths } from "../lib/copy.js";
@@ -55,6 +55,8 @@ function reuseWorktree(
   } else {
     checkoutNewBranch(worktreePath, branchName, startPoint);
   }
+
+  markWorktreeInUse(worktreePath);
 
   return worktreePath;
 }
@@ -149,7 +151,7 @@ export function start(ref?: string, options?: { existing?: boolean; branchName?:
 
   const worktrees = listWorktrees();
   const available = worktrees.find(
-    (wt) => wt.branch === null && wt.path.startsWith(parentDir + "/")
+    (wt) => wt.path.startsWith(parentDir + "/") && isWorktreeAvailable(wt.path)
   );
 
   const worktreePath = available

@@ -1,6 +1,6 @@
 import { basename, join } from "node:path";
 import { homedir } from "node:os";
-import { getRepoRoot, isWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, getMainRepoName, deleteBranch, detachHead, resetWorktree, listWorktrees, isGraphiteManaged, getDefaultBranch, branchHasCommitsBeyond } from "../lib/git.js";
+import { getRepoRoot, isWorktree, hasUncommittedChanges, getCurrentBranch, getMainWorktreePath, getMainRepoName, deleteBranch, detachHead, resetWorktree, listWorktrees, isGraphiteManaged, getDefaultBranch, branchHasCommitsBeyond, markWorktreeAvailable } from "../lib/git.js";
 import { closeCurrentWindow } from "../lib/iterm.js";
 import { removeCachedWindow } from "../lib/cache.js";
 import { loadConfig } from "../lib/config.js";
@@ -168,6 +168,7 @@ export async function finish(
   }
 
   resetWorktree(worktreePath);
+  markWorktreeAvailable(worktreePath);
   console.log("Worktree cleaned up and ready for reuse");
 
   removeCachedWindow(worktreePath);

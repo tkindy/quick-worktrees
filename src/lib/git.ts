@@ -1,5 +1,6 @@
 import { execSync } from "node:child_process";
-import { basename } from "node:path";
+import { existsSync, unlinkSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
 
 export function getRepoRoot(cwd?: string): string {
   return execSync("git rev-parse --show-toplevel", { encoding: "utf-8", cwd }).trim();
@@ -152,6 +153,37 @@ export function getDefaultBranch(cwd?: string): string | null {
   }
 
   return null;
+}
+
+function getWorktreeGitDir(worktreePath: string): string {
+  return execSync("git rev-parse --absolute-git-dir", {
+    encoding: "utf-8",
+    cwd: worktreePath,
+  }).trim();
+}
+
+const AVAILABLE_MARKER = "wt-available";
+
+export function markWorktreeAvailable(worktreePath: string): void {
+  const gitDir = getWorktreeGitDir(worktreePath);
+  writeFileSync(join(gitDir, AVAILABLE_MARKER), "");
+}
+
+export function markWorktreeInUse(worktreePath: string): void {
+  const gitDir = getWorktreeGitDir(worktreePath);
+  const markerPath = join(gitDir, AVAILABLE_MARKER);
+  if (existsSync(markerPath)) {
+    unlinkSync(markerPath);
+  }
+}
+
+export function isWorktreeAvailable(worktreePath: string): boolean {
+  try {
+    const gitDir = getWorktreeGitDir(worktreePath);
+    return existsSync(join(gitDir, AVAILABLE_MARKER));
+  } catch {
+    return false;
+  }
 }
 
 export function branchHasCommitsBeyond(
