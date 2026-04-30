@@ -25,14 +25,14 @@ export function list(): void {
   const all = [...active, ...available];
 
   const names = all.map((wt) => basename(wt.path));
-  const maxLen = Math.max(...names.map((n) => n.length));
+  const maxNameLen = Math.max(...names.map((n) => n.length));
+  const maxStatusLen = Math.max("available".length, "in use".length);
 
   for (let i = 0; i < all.length; i++) {
     if (i === active.length && active.length > 0) console.log();
     const wt = all[i];
-    const status = wt.available
-      ? "(available)"
-      : wt.branch ?? "(detached)";
-    console.log(`${names[i].padEnd(maxLen)}  ${status}`);
+    const status = wt.available ? "available" : "in use";
+    const ref = wt.available ? "" : `  ${wt.branch ?? "detached"}`;
+    console.log(`${names[i].padEnd(maxNameLen)}  ${status.padEnd(maxStatusLen)}${ref}`);
   }
 }
