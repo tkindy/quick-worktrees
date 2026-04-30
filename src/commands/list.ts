@@ -32,7 +32,7 @@ export function list(): void {
     if (i === active.length && active.length > 0) console.log();
     const wt = all[i];
     const status = wt.available ? "available" : "in use";
-    const ref = wt.available ? "" : `  ${wt.branch ?? "detached"}`;
+    const ref = wt.available ? "" : `  ${wt.branch ?? "(detached)"}`;
     console.log(`${names[i].padEnd(maxNameLen)}  ${status.padEnd(maxStatusLen)}${ref}`);
   }
 }
